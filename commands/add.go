@@ -1,19 +1,20 @@
 package commands
 
 import (
-	// "drach/db"
-	// "drach/models"
+	"drach/db"
 	"drach/helpers"
+	"drach/models"
 	"flag"
 	"fmt"
+	"log"
 	"os"
 )
 
 func AddCmd(args []string) {
 	cmd := flag.NewFlagSet("add", flag.ExitOnError)
 
-	amount := cmd.Int("amount", 0, "Value of expense, integer")
-	cmd.IntVar(amount, "a", 0, "Alias for --amount")
+	amount := cmd.Float64("amount", 0, "Value of expense, integer")
+	cmd.Float64Var(amount, "a", 0, "Alias for --amount")
 
 	category := cmd.String("category", "", "Category of expense for summary purposes")
 	cmd.StringVar(category, "c", "", "Alias for --category")
@@ -28,7 +29,10 @@ func AddCmd(args []string) {
 		fmt.Printf("Error parsing flags")
 	}
 
-	fmt.Println("Called add")
-	fmt.Println(*amount)
-	fmt.Println(*category)
+	err := models.AddExpense(db.DB, *amount, *category)
+	if err != nil {
+		log.Fatalf("Error on add expense: %v", err)
+	}
+
+	fmt.Println("Expense added successfully")
 }
