@@ -1,31 +1,34 @@
 package commands
 
 import (
-	"drach/db"
-	"drach/models"
+	// "drach/db"
+	// "drach/models"
+	"drach/helpers"
 	"flag"
 	"fmt"
-	"log"
+	"os"
 )
 
 func AddCmd(args []string) {
 	cmd := flag.NewFlagSet("add", flag.ExitOnError)
-	description := cmd.String("d", "", "Task description")
+
+	amount := cmd.Int("amount", 0, "Value of expense, integer")
+	cmd.IntVar(amount, "a", 0, "Alias for --amount")
+
+	category := cmd.String("category", "", "Category of expense for summary purposes")
+	cmd.StringVar(category, "c", "", "Alias for --category")
+
+	if helpers.FlagProvided("category", cmd) && *category == "" {
+		fmt.Print("Error: Category cannot be empty")
+		cmd.Usage()
+		os.Exit(1)
+	}
 
 	if err := cmd.Parse(args); err != nil {
-		fmt.Printf("Error on args parsing: %v", err)
+		fmt.Printf("Error parsing flags")
 	}
 
-	if *description == "" {
-		fmt.Println("Error: description must not be empty")
-		cmd.Usage()
-		return
-	}
-
-	err := models.AddTask(db.DB, *description)
-	if err != nil {
-		log.Fatalf("Error on add task: %v", err)
-	}
-
-	fmt.Println("Task added successfully")
+	fmt.Println("Called add")
+	fmt.Println(*amount)
+	fmt.Println(*category)
 }

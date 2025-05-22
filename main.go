@@ -11,7 +11,7 @@ import (
 func main() {
 	err := db.InitDB()
 	if err != nil {
-		log.Fatalf("Erro ao inicializar o banco de dados: %v", err)
+		log.Fatalf("Error on database initialization: %v", err)
 	}
 
 	defer func() {
@@ -26,10 +26,12 @@ func main() {
 	}
 
 	switch os.Args[1] {
+	case "addTask":
+		commands.AddTaskCmd(os.Args[2:])
+	case "listTasks":
+		commands.ListCmd()
 	case "add":
 		commands.AddCmd(os.Args[2:])
-	case "list":
-		commands.ListCmd()
 	default:
 		printHelp()
 	}
