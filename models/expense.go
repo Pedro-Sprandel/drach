@@ -3,6 +3,7 @@ package models
 import (
 	"database/sql"
 	"log"
+	"strings"
 	"time"
 )
 
@@ -45,6 +46,36 @@ func ListExpenses(db *sql.DB, category string) ([]Expense, error) {
 	}
 
 	return expenses, nil
+}
+
+func EditExpense(db *sql.DB, id string, description string, category string, amount float64) error {
+	var query strings.Builder
+	query.WriteString("UPDATE expenses SET ")
+
+	var args []any
+	var updates []string
+
+	if description != "" {
+		updates = append(updates, "description = ?")
+		args = append(args, description)
+	}
+
+	if amount != 0 {
+		updates = append(updates, "amount = ?")
+		args = append(args, amount)
+	}
+
+	if category != "" {
+		updates = append(updates, "category = ?")
+		args = append(args, category)
+	}
+
+	query.WriteString(strings.Join(updates, ", "))
+	query.WriteString(" WHERE id = ?")
+	args = append(args, id)
+
+	_, err := db.Exec(query.String(), args...)
+	return err
 }
 
 func RemoveExpense(db *sql.DB, id string) error {

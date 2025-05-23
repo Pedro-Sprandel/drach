@@ -30,6 +30,8 @@ func main() {
 		commands.ListCmd(os.Args[2:])
 	case "add":
 		commands.AddCmd(os.Args[2:])
+	case "edit":
+		commands.EditCmd(os.Args[2:])
 	case "remove":
 		commands.RemoveCmd(os.Args[2:])
 	default:

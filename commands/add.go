@@ -11,18 +11,18 @@ import (
 const defaultValueCategory = "Sem categoria"
 
 func AddCmd(args []string) {
-	cmd := flag.NewFlagSet("add", flag.ExitOnError)
+	fs := flag.NewFlagSet("add", flag.ExitOnError)
 
-	description := cmd.String("description", "", "Description of expense, string")
-	cmd.StringVar(description, "d", "", "Alias for --description")
+	description := fs.String("description", "", "Description of expense, string")
+	fs.StringVar(description, "d", "", "Alias for --description")
 
-	amount := cmd.Float64("amount", 0, "Value of expense, integer")
-	cmd.Float64Var(amount, "a", 0, "Alias for --amount")
+	amount := fs.Float64("amount", 0, "Value of expense, integer")
+	fs.Float64Var(amount, "a", 0, "Alias for --amount")
 
-	category := cmd.String("category", "", "Category of expense for summary purposes")
-	cmd.StringVar(category, "c", "", "Alias for --category")
+	category := fs.String("category", "", "Category of expense for summary purposes")
+	fs.StringVar(category, "c", "", "Alias for --category")
 
-	if err := cmd.Parse(args); err != nil {
+	if err := fs.Parse(args); err != nil {
 		fmt.Printf("Error parsing flags")
 	}
 
