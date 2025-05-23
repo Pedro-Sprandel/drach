@@ -26,12 +26,12 @@ func main() {
 	}
 
 	switch os.Args[1] {
-	case "addTask":
-		commands.AddTaskCmd(os.Args[2:])
-	case "listTasks":
-		commands.ListCmd()
+	case "list":
+		commands.ListCmd(os.Args[2:])
 	case "add":
 		commands.AddCmd(os.Args[2:])
+	case "remove":
+		commands.RemoveCmd(os.Args[2:])
 	default:
 		printHelp()
 	}

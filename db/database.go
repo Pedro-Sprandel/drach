@@ -32,6 +32,7 @@ var tables = []TableDefinition{
 		Name: "expenses",
 		Schema: `(
             id INTEGER PRIMARY KEY AUTOINCREMENT,
+            description VARCHAR(50) NOT NULL,
             amount DECIMAL(10, 2) NOT NULL,
             category VARCHAR(50) NOT NULL,
             created_at DATETIME DEFAULT CURRENT_TIMESTAMP

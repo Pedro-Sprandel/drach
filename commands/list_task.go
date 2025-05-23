@@ -6,7 +6,7 @@ import (
 	"fmt"
 )
 
-func ListCmd() {
+func ListTasksCmd() {
 	tasks, err := models.ListTasks(db.DB)
 	if err != nil {
 		fmt.Printf("Error on list tasks: %v\n", err)

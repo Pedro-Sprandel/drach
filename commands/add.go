@@ -2,16 +2,19 @@ package commands
 
 import (
 	"drach/db"
-	"drach/helpers"
 	"drach/models"
 	"flag"
 	"fmt"
 	"log"
-	"os"
 )
+
+const defaultValueCategory = "Sem categoria"
 
 func AddCmd(args []string) {
 	cmd := flag.NewFlagSet("add", flag.ExitOnError)
+
+	description := cmd.String("description", "", "Description of expense, string")
+	cmd.StringVar(description, "d", "", "Alias for --description")
 
 	amount := cmd.Float64("amount", 0, "Value of expense, integer")
 	cmd.Float64Var(amount, "a", 0, "Alias for --amount")
@@ -19,17 +22,15 @@ func AddCmd(args []string) {
 	category := cmd.String("category", "", "Category of expense for summary purposes")
 	cmd.StringVar(category, "c", "", "Alias for --category")
 
-	if helpers.FlagProvided("category", cmd) && *category == "" {
-		fmt.Print("Error: Category cannot be empty")
-		cmd.Usage()
-		os.Exit(1)
-	}
-
 	if err := cmd.Parse(args); err != nil {
 		fmt.Printf("Error parsing flags")
 	}
 
-	err := models.AddExpense(db.DB, *amount, *category)
+	if *category == "" {
+		*category = defaultValueCategory
+	}
+
+	err := models.AddExpense(db.DB, *description, *amount, *category)
 	if err != nil {
 		log.Fatalf("Error on add expense: %v", err)
 	}
