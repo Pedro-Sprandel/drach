@@ -2,20 +2,8 @@ package helpers
 
 import (
 	"drach/models"
-	"flag"
 	"fmt"
 )
-
-func FlagProvided(name string, fs *flag.FlagSet) bool {
-	found := false
-	fs.Visit(func(f *flag.Flag) {
-		if f.Name == name {
-			found = true
-		}
-	})
-
-	return found
-}
 
 func PrintExpenses(expenses []models.Expense) {
 	var sum float64 = 0

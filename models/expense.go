@@ -16,6 +16,7 @@ type Expense struct {
 
 func AddExpense(db *sql.DB, description string, amount float64, category string) error {
 	_, err := db.Exec("INSERT INTO expenses(description, amount, category) VALUES (?, ?, ?)", description, amount, category)
+
 	return err
 }
 
@@ -44,4 +45,10 @@ func ListExpenses(db *sql.DB, category string) ([]Expense, error) {
 	}
 
 	return expenses, nil
+}
+
+func RemoveExpense(db *sql.DB, id string) error {
+	_, err := db.Exec("DELETE FROM expenses WHERE id = ?", id)
+
+	return err
 }
