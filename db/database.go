@@ -35,6 +35,8 @@ var tables = []TableDefinition{
             description VARCHAR(50) NOT NULL,
             amount DECIMAL(10, 2) NOT NULL,
             category VARCHAR(50) NOT NULL,
+            month INTEGER NOT NULL,
+            year INTEGER NOT NULL,
             created_at DATETIME DEFAULT CURRENT_TIMESTAMP
         )`,
 		Indexes: []string{
