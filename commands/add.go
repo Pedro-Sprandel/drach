@@ -10,7 +10,7 @@ import (
 	"os"
 )
 
-const defaultValueDescription = "Sem categoria"
+const defaultValueDescription = "Sem descrição"
 const defaultValueCategory = "Sem categoria"
 
 func AddCmd(args []string) {
