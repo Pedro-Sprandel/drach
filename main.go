@@ -34,14 +34,22 @@ func main() {
 		commands.EditCmd(os.Args[2:])
 	case "remove":
 		commands.RemoveCmd(os.Args[2:])
+	case "help":
+		printHelp()
 	default:
+		fmt.Println("Unkwown command")
+		fmt.Println()
 		printHelp()
 	}
 }
 
 func printHelp() {
 	fmt.Println("Usage: drach <command> [options]")
+	fmt.Println()
 	fmt.Println("Commands list:")
-	fmt.Println("  add -d \"description\"  Add new task")
-	fmt.Println("  list                 List all tasks")
+	fmt.Println()
+	fmt.Println("Add new task: add -d <description> -c <category> -a <amount>* -m <month> -y <year>")
+	fmt.Println("List tasks: list -c <category> -m <month> -y <year>")
+	fmt.Println("Edit task: edit -id <id>* -d <description> -c <category> -a <amount>* -m <month> -y <year>")
+	fmt.Println("Remove task: remove -id <id>*")
 }
