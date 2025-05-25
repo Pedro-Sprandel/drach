@@ -7,6 +7,7 @@ import (
 	"flag"
 	"fmt"
 	"log"
+	"os"
 )
 
 const defaultValueDescription = "Sem categoria"
@@ -34,6 +35,12 @@ func AddCmd(args []string) {
 
 	if err := fs.Parse(args); err != nil {
 		fmt.Printf("Error parsing flags")
+	}
+
+	if *year < 2000 || *year > currentYear+1 {
+		fmt.Println("Invalid year")
+		fs.Usage()
+		os.Exit(1)
 	}
 
 	err := models.AddExpense(db.DB, *description, *amount, *category, *month, *year)
