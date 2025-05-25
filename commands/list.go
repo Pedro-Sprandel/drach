@@ -10,15 +10,22 @@ import (
 )
 
 func ListCmd(args []string) {
-	cmd := flag.NewFlagSet("list", flag.ExitOnError)
-	category := cmd.String("category", "", "Filter by category")
-	cmd.StringVar(category, "c", "", "Filter by category")
+	fs := flag.NewFlagSet("list", flag.ExitOnError)
 
-	if err := cmd.Parse(args); err != nil {
+	category := fs.String("category", "", "Filter by category")
+	fs.StringVar(category, "c", "", "Filter by category")
+
+	month := fs.Int("month", 0, "Month of expense, integer")
+	fs.IntVar(month, "m", 0, "Month of expense, integer")
+
+	year := fs.Int("year", 0, "Year of expense, integer")
+	fs.IntVar(year, "y", 0, "Year of expense, integer")
+
+	if err := fs.Parse(args); err != nil {
 		fmt.Printf("Error parsing flags")
 	}
 
-	expenses, err := models.ListExpenses(db.DB, *category)
+	expenses, err := models.ListExpenses(db.DB, *category, *month, *year)
 	if err != nil {
 		log.Fatalf("Error on list expense: %v", err)
 	}

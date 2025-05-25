@@ -30,8 +30,35 @@ func AddExpense(db *sql.DB, description string, amount float64, category string,
 	return err
 }
 
-func ListExpenses(db *sql.DB, category string) ([]Expense, error) {
-	rows, err := db.Query("SELECT id, description, amount, category, month, year, created_at FROM expenses")
+func ListExpenses(db *sql.DB, category string, month int, year int) ([]Expense, error) {
+	query := `
+        SELECT id, description, amount, category, month, year, created_at 
+        FROM expenses
+    `
+
+	var args []any
+	filters := []string{}
+
+	if category != "" {
+		filters = append(filters, "category = ?")
+		args = append(args, category)
+	}
+
+	if month > 0 {
+		filters = append(filters, "month = ?")
+		args = append(args, month)
+	}
+
+	if year > 0 {
+		filters = append(filters, "year = ?")
+		args = append(args, year)
+	}
+
+	if len(filters) > 0 {
+		query += " WHERE " + strings.Join(filters, " AND ")
+	}
+
+	rows, err := db.Query(query, args...)
 	if err != nil {
 		return nil, err
 	}
