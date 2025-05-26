@@ -119,3 +119,64 @@ func RemoveExpense(db *sql.DB, id string) error {
 
 	return err
 }
+
+type ExpenseSummary struct {
+	Category    string
+	Month       int
+	Year        int
+	TotalAmount float64
+}
+
+func GetExpenseSummary(db *sql.DB, year int) ([]ExpenseSummary, map[string]float64, map[int]float64, float64, error) {
+	query := `
+		SELECT 
+			category, 
+			month, 
+			year, 
+			SUM(amount) as total_amount
+		FROM 
+			expenses
+		WHERE 
+			year = ?
+		GROUP BY 
+			category, month, year
+		ORDER BY 
+			year, month, category
+	`
+
+	rows, err := db.Query(query, year)
+	if err != nil {
+		return nil, nil, nil, 0, err
+	}
+	defer func() {
+		if err := rows.Close(); err != nil {
+			log.Printf("failed to close rows: %v", err)
+		}
+	}()
+
+	var summaries []ExpenseSummary
+	categoryTotals := make(map[string]float64)
+	monthlyTotals := make(map[int]float64)
+	var grandTotal float64
+
+	for rows.Next() {
+		var s ExpenseSummary
+		err := rows.Scan(&s.Category, &s.Month, &s.Year, &s.TotalAmount)
+		if err != nil {
+			return nil, nil, nil, 0, err
+		}
+
+		summaries = append(summaries, s)
+
+		// Acumula totais por categoria
+		categoryTotals[s.Category] += s.TotalAmount
+
+		// Acumula totais por mês
+		monthlyTotals[s.Month] += s.TotalAmount
+
+		// Acumula total geral
+		grandTotal += s.TotalAmount
+	}
+
+	return summaries, categoryTotals, monthlyTotals, grandTotal, nil
+}

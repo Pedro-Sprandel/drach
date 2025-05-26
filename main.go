@@ -34,6 +34,8 @@ func main() {
 		commands.EditCmd(os.Args[2:])
 	case "remove":
 		commands.RemoveCmd(os.Args[2:])
+	case "summary":
+		commands.SummaryCmd(os.Args[2:])
 	case "help":
 		printHelp()
 	default:
