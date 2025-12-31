@@ -127,24 +127,34 @@ type ExpenseSummary struct {
 	TotalAmount float64
 }
 
-func GetExpenseSummary(db *sql.DB, year int) ([]ExpenseSummary, map[string]float64, map[int]float64, float64, error) {
+func GetExpenseSummary(db *sql.DB, year int, month ...int) ([]ExpenseSummary, map[string]float64, map[int]float64, float64, error) {
 	query := `
-		SELECT 
-			category, 
-			month, 
-			year, 
-			SUM(amount) as total_amount
-		FROM 
-			expenses
-		WHERE 
-			year = ?
-		GROUP BY 
-			category, month, year
-		ORDER BY 
-			year, month, category
-	`
+        SELECT 
+            category, 
+            month, 
+            year, 
+            SUM(amount) as total_amount
+        FROM 
+            expenses
+        WHERE 
+            year = ?
+    `
 
-	rows, err := db.Query(query, year)
+	args := []any{year}
+
+	if len(month) > 0 {
+		query += " AND month = ?"
+		args = append(args, month[0])
+	}
+
+	query += `
+        GROUP BY 
+            category, month, year
+        ORDER BY 
+            year, month, category
+    `
+
+	rows, err := db.Query(query, args...)
 	if err != nil {
 		return nil, nil, nil, 0, err
 	}
@@ -167,15 +177,14 @@ func GetExpenseSummary(db *sql.DB, year int) ([]ExpenseSummary, map[string]float
 		}
 
 		summaries = append(summaries, s)
-
-		// Acumula totais por categoria
 		categoryTotals[s.Category] += s.TotalAmount
-
-		// Acumula totais por mês
 		monthlyTotals[s.Month] += s.TotalAmount
-
-		// Acumula total geral
 		grandTotal += s.TotalAmount
+	}
+
+	if len(month) > 0 {
+		monthTotal := monthlyTotals[month[0]]
+		return summaries, categoryTotals, nil, monthTotal, nil
 	}
 
 	return summaries, categoryTotals, monthlyTotals, grandTotal, nil
