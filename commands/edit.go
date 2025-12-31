@@ -1,12 +1,13 @@
 package commands
 
 import (
-	"drach/db"
-	"drach/models"
 	"flag"
 	"fmt"
 	"log"
 	"os"
+
+	"drach/db"
+	"drach/models"
 )
 
 func EditCmd(args []string) {
@@ -17,8 +18,8 @@ func EditCmd(args []string) {
 	description := fs.String("description", "", "Description of expense, string")
 	fs.StringVar(description, "d", "", "Alias for --description")
 
-	category := fs.String("category", "", "Category of expense for summary purposes")
-	fs.StringVar(category, "c", "", "Alias for --category")
+	categoryID := fs.String("category", "", "Category of expense for summary purposes, integer")
+	fs.StringVar(categoryID, "c", 0, "Alias for --category")
 
 	amount := fs.Float64("amount", 0, "Value of expense, integer")
 	fs.Float64Var(amount, "a", 0, "Value of expense, integer")
@@ -33,13 +34,13 @@ func EditCmd(args []string) {
 		os.Exit(1)
 	}
 
-	if *description == "" && *amount == 0 && *category == "" {
+	if *description == "" && *amount == 0 && *categoryID == 0 {
 		fmt.Println("Error: at least one of --description, --amount or --category must be provided")
 		fs.Usage()
 		os.Exit(1)
 	}
 
-	err := models.EditExpense(db.DB, *id, *description, *category, *amount)
+	err := models.EditExpense(db.DB, *id, *description, *categoryID, *amount)
 	if err != nil {
 		log.Fatalf("Error on edit expense %v:", err)
 	}

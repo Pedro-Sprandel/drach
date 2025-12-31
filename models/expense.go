@@ -11,18 +11,18 @@ type Expense struct {
 	ID          int
 	Description string
 	Amount      float64
-	Category    string
+	CategoryID  string
 	Month       int
 	Year        int
 	CreatedAt   time.Time
 }
 
-func AddExpense(db *sql.DB, description string, amount float64, category string, month int, year int) error {
+func AddExpense(db *sql.DB, description string, amount float64, categoryID int64, month int, year int) error {
 	_, err := db.Exec(
-		"INSERT INTO expenses(description, amount, category, month, year) VALUES (?, ?, ?, ?, ?)",
+		"INSERT INTO expenses(description, amount, category_id, month, year) VALUES (?, ?, ?, ?, ?)",
 		description,
 		amount,
-		category,
+		categoryID,
 		month,
 		year,
 	)
@@ -30,19 +30,14 @@ func AddExpense(db *sql.DB, description string, amount float64, category string,
 	return err
 }
 
-func ListExpenses(db *sql.DB, category string, month int, year int) ([]Expense, error) {
+func ListExpenses(db *sql.DB, categoryID string, month int, year int) ([]Expense, error) {
 	query := `
-        SELECT id, description, amount, category, month, year, created_at 
+        SELECT id, description, amount, category_id, month, year, created_at 
         FROM expenses
     `
 
 	var args []any
 	filters := []string{}
-
-	if category != "" {
-		filters = append(filters, "category = ?")
-		args = append(args, category)
-	}
 
 	if month > 0 {
 		filters = append(filters, "month = ?")
@@ -73,7 +68,7 @@ func ListExpenses(db *sql.DB, category string, month int, year int) ([]Expense, 
 	for rows.Next() {
 		var e Expense
 
-		err := rows.Scan(&e.ID, &e.Description, &e.Amount, &e.Category, &e.Month, &e.Year, &e.CreatedAt)
+		err := rows.Scan(&e.ID, &e.Description, &e.Amount, &e.CategoryID, &e.Month, &e.Year, &e.CreatedAt)
 		if err != nil {
 			return nil, err
 		}
@@ -84,7 +79,7 @@ func ListExpenses(db *sql.DB, category string, month int, year int) ([]Expense, 
 	return expenses, nil
 }
 
-func EditExpense(db *sql.DB, id string, description string, category string, amount float64) error {
+func EditExpense(db *sql.DB, id string, description string, categoryID int64, amount float64) error {
 	var query strings.Builder
 	query.WriteString("UPDATE expenses SET ")
 
@@ -101,7 +96,8 @@ func EditExpense(db *sql.DB, id string, description string, category string, amo
 		args = append(args, amount)
 	}
 
-	if category != "" {
+	// MUDAR DEPOIS
+	if categoryID > 0 {
 		updates = append(updates, "category = ?")
 		args = append(args, category)
 	}

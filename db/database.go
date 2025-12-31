@@ -16,16 +16,15 @@ type TableDefinition struct {
 
 var tables = []TableDefinition{
 	{
-		Name: "tasks",
+		Name: "categories",
 		Schema: `(
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            description TEXT NOT NULL,
-            created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-            completed BOOLEAN DEFAULT FALSE
-        )`,
+						id INTEGER PRIMARY KEY AUTOINCREMENT,
+						name TEXT NOT NULL,
+						description TEXT,
+						created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+				)`,
 		Indexes: []string{
-			"CREATE INDEX IF NOT EXISTS idx_tasks_completed ON tasks(completed)",
-			"CREATE INDEX IF NOT EXISTS idx_tasks_created_at ON tasks(created_at)",
+			"CREATE INDEX IF NOT EXISTS idx_categories_name ON categories(name)",
 		},
 	},
 	{
@@ -34,13 +33,13 @@ var tables = []TableDefinition{
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             description VARCHAR(50) NOT NULL,
             amount DECIMAL(10, 2) NOT NULL,
-            category VARCHAR(50) NOT NULL,
             month INTEGER NOT NULL,
             year INTEGER NOT NULL,
-            created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+            created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+            FOREIGN KEY (category_id) REFERENCES categories(id) ON DELETE RESTRICT
         )`,
 		Indexes: []string{
-			"CREATE INDEX IF NOT EXISTS idx_expenses_category ON expenses(category)",
+			"CREATE INDEX IF NOT EXISTS idx_expenses_category_id ON expenses(category_id)",
 			"CREATE INDEX IF NOT EXISTS idx_expenses_created_at ON expenses(created_at)",
 		},
 	},
@@ -58,9 +57,14 @@ func InitDB() error {
 		}
 	}
 
-	DB, err = sql.Open("sqlite3", dbPath+"?_loc=auto&_time_format=sqlite")
+	DB, err = sql.Open("sqlite3", dbPath+"?_foreign_keys=on&_loc=auto&_time_format=sqlite")
 	if err != nil {
 		return fmt.Errorf("error to open database: %v", err)
+	}
+
+	_, err = DB.Exec("PRAGMA foreign_keys = ON")
+	if err != nil {
+		return fmt.Errorf("failed to enable foreign keys: %v", err)
 	}
 
 	for _, table := range tables {

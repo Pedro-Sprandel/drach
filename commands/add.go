@@ -1,17 +1,20 @@
 package commands
 
 import (
-	"drach/db"
-	"drach/helpers"
-	"drach/models"
 	"flag"
 	"fmt"
 	"log"
 	"os"
+
+	"drach/db"
+	"drach/helpers"
+	"drach/models"
 )
 
-const defaultValueDescription = "Sem descrição"
-const defaultValueCategory = "Sem categoria"
+const (
+	defaultValueDescription = "Sem descrição"
+	defaultValueCategory    = "Sem categoria"
+)
 
 func AddCmd(args []string) {
 	fs := flag.NewFlagSet("add", flag.ExitOnError)
@@ -22,8 +25,8 @@ func AddCmd(args []string) {
 	amount := fs.Float64("amount", 0, "Value of expense, integer")
 	fs.Float64Var(amount, "a", 0, "Alias for --amount")
 
-	category := fs.String("category", defaultValueCategory, "Category of expense for summary purposes")
-	fs.StringVar(category, "c", defaultValueCategory, "Alias for --category")
+	categoryID := fs.String("category", "", "Category of expense (optional - will prompt if not provided)")
+	fs.IntVar(categoryID, "c", 0, "Alias for --category")
 
 	currentMonth := helpers.CurrentMonth()
 	month := fs.Int("month", currentMonth, "Month of expense, integer")
@@ -43,7 +46,14 @@ func AddCmd(args []string) {
 		os.Exit(1)
 	}
 
-	err := models.AddExpense(db.DB, *description, *amount, *category, *month, *year)
+	if *categoryID == 0 {
+		*categoryID, err = helpers.SelectCategory()
+		if err != nil {
+			log.Fatalf("Erro ao selecionar categoria: %v", err)
+		}
+	}
+
+	err = models.AddExpense(db.DB, *description, *amount, *categoryID, *month, *year)
 	if err != nil {
 		log.Fatalf("Error on add expense: %v", err)
 	}
