@@ -34,24 +34,29 @@ func Line(char string) string {
 	return indent + strings.Repeat(char, width)
 }
 
+func LineWithWidth(char string, w int) string {
+	return indent + strings.Repeat(char, w)
+}
+
 func PrintExpenses(expenses []services.ExpenseWithCategoryName) {
 	var sum float64 = 0
 
-	fmt.Printf("%-5s | %-24s | %-15s | %-2s | %-4s | %-7s\n", "ID", "Description", "Category", "Month", "Year", "Amount")
-	fmt.Println("------|--------------------------|-----------------|-------|------|--------")
+	fmt.Println()
+	fmt.Println()
+	fmt.Print(indent + fmt.Sprintf("%-5s | %-16s | %-12s | %-8s | %-7s\n", "ID", "Descrição", "Categoria", "Mês/Ano", "Valor"))
+	fmt.Println(LineWithWidth("-", 60))
 	for _, expense := range expenses {
 		sum += expense.Amount
-		fmt.Printf(
-			"%-5d | %-24s | %-15s | %-5s | %-4d | R$%-4.2f\n",
+		fmt.Print(indent + fmt.Sprintf(
+			"%-5d | %-16s | %-12s | %-8s | R$%-4.2f\n",
 			expense.ID,
 			expense.Description,
 			expense.CategoryName,
-			MonthName(expense.Month),
-			expense.Year,
+			fmt.Sprintf("%s/%d", MonthName(expense.Month), expense.Year),
 			expense.Amount,
-		)
+		))
 	}
-	fmt.Printf("\nTotal: R$%-4.2f", sum)
+	fmt.Printf("\n%sTotal: R$%-4.2f", indent, sum)
 }
 
 func PrintExpenseSummary(summaries []services.ExpenseSummary, categoryTotals map[string]float64, monthlyTotals map[int]float64, grandTotal float64) {
