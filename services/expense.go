@@ -1,4 +1,4 @@
-package models
+package services
 
 import (
 	"database/sql"
@@ -18,14 +18,8 @@ type Expense struct {
 }
 
 type ExpenseWithCategoryName struct {
-	ID           int
-	Description  string
-	Amount       float64
-	CategoryID   int
+	Expense
 	CategoryName string
-	Month        int
-	Year         int
-	CreatedAt    time.Time
 }
 
 func AddExpense(db *sql.DB, description string, amount float64, categoryID int, month int, year int) error {
@@ -132,30 +126,40 @@ func RemoveExpense(db *sql.DB, id string) error {
 }
 
 type ExpenseSummary struct {
-	CategoryID  int
-	Month       int
-	Year        int
-	TotalAmount float64
+	CategoryName string
+	CategoryID   int
+	Month        int
+	Year         int
+	Amount       float64
+	TotalAmount  float64
 }
 
-func GetExpenseSummary(db *sql.DB, year int, month ...int) ([]ExpenseSummary, map[string]float64, map[int]float64, float64, error) {
+func GetExpenseSummary(db *sql.DB, categoryID int, year int, month int) ([]ExpenseSummary, map[string]float64, map[int]float64, float64, error) {
 	query := `
         SELECT 
-            category_id, 
-            month, 
-            year, 
-            SUM(amount) as total_amount
+  					c.name,
+  					e.category_id,
+  					e.month,
+  					e.year,
+            e.amount, 
+            SUM(e.amount) as total_amount
         FROM 
-            expenses
+            expenses e
+  			LEFT JOIN categories c ON e.category_id = c.id
         WHERE 
             year = ?
-    `
+  `
 
 	args := []any{year}
 
-	if len(month) > 0 {
+	if month != 0 {
 		query += " AND month = ?"
-		args = append(args, month[0])
+		args = append(args, month)
+	}
+
+	if categoryID != 0 {
+		query += " AND category_id = ?"
+		args = append(args, categoryID)
 	}
 
 	query += `
@@ -169,6 +173,7 @@ func GetExpenseSummary(db *sql.DB, year int, month ...int) ([]ExpenseSummary, ma
 	if err != nil {
 		return nil, nil, nil, 0, err
 	}
+
 	defer func() {
 		if err := rows.Close(); err != nil {
 			log.Printf("failed to close rows: %v", err)
@@ -182,18 +187,19 @@ func GetExpenseSummary(db *sql.DB, year int, month ...int) ([]ExpenseSummary, ma
 
 	for rows.Next() {
 		var s ExpenseSummary
-		err := rows.Scan(&s.CategoryID, &s.Month, &s.Year, &s.TotalAmount)
+		err := rows.Scan(&s.CategoryName, &s.CategoryID, &s.Month, &s.Year, &s.Amount, &s.TotalAmount)
 		if err != nil {
 			return nil, nil, nil, 0, err
 		}
 
 		summaries = append(summaries, s)
+		categoryTotals[s.CategoryName] += s.TotalAmount
 		monthlyTotals[s.Month] += s.TotalAmount
 		grandTotal += s.TotalAmount
 	}
 
-	if len(month) > 0 {
-		monthTotal := monthlyTotals[month[0]]
+	if month != 0 {
+		monthTotal := monthlyTotals[month]
 		return summaries, categoryTotals, nil, monthTotal, nil
 	}
 

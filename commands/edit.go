@@ -7,7 +7,7 @@ import (
 	"os"
 
 	"drach/db"
-	"drach/models"
+	"drach/services"
 )
 
 func EditCmd(args []string) {
@@ -40,7 +40,7 @@ func EditCmd(args []string) {
 		os.Exit(1)
 	}
 
-	err := models.EditExpense(db.DB, *id, *description, *categoryID, *amount)
+	err := services.EditExpense(db.DB, *id, *description, *categoryID, *amount)
 	if err != nil {
 		log.Fatalf("Error on edit expense %v:", err)
 	}

@@ -8,7 +8,7 @@ import (
 
 	"drach/db"
 	"drach/helpers"
-	"drach/models"
+	"drach/services"
 )
 
 const (
@@ -55,7 +55,7 @@ func AddCmd(args []string) {
 		}
 	}
 
-	err = models.AddExpense(db.DB, *description, *amount, *categoryID, *month, *year)
+	err = services.AddExpense(db.DB, *description, *amount, *categoryID, *month, *year)
 	if err != nil {
 		log.Fatalf("Error on add expense: %v", err)
 	}

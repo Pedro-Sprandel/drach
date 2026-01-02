@@ -1,11 +1,12 @@
 package main
 
 import (
-	"drach/commands"
-	"drach/db"
 	"fmt"
 	"log"
 	"os"
+
+	"drach/commands"
+	"drach/db"
 )
 
 func main() {

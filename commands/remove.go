@@ -1,12 +1,13 @@
 package commands
 
 import (
-	"drach/db"
-	"drach/models"
 	"flag"
 	"fmt"
 	"log"
 	"os"
+
+	"drach/db"
+	"drach/services"
 )
 
 func RemoveCmd(args []string) {
@@ -24,7 +25,7 @@ func RemoveCmd(args []string) {
 		os.Exit(1)
 	}
 
-	err := models.RemoveExpense(db.DB, *id)
+	err := services.RemoveExpense(db.DB, *id)
 	if err != nil {
 		log.Fatalf("Error on add expense: %v", err)
 	}

@@ -8,11 +8,11 @@ import (
 	"strings"
 
 	"drach/db"
-	"drach/models"
+	"drach/services"
 )
 
 func SelectCategory() (int, error) {
-	categories, err := models.GetAllCategories(db.DB)
+	categories, err := services.GetAllCategories(db.DB)
 	if err != nil {
 		return 0, fmt.Errorf("erro ao buscar categorias: %v", err)
 	}
@@ -82,7 +82,7 @@ func createNewCategory() (int, error) {
 	}
 	description = strings.TrimSpace(description)
 
-	result, err := models.AddCategory(db.DB, name, description)
+	result, err := services.AddCategory(db.DB, name, description)
 	if err != nil {
 		return 0, fmt.Errorf("erro ao criar categoria: %v", err)
 	}

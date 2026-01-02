@@ -7,7 +7,7 @@ import (
 
 	"drach/db"
 	"drach/helpers"
-	"drach/models"
+	"drach/services"
 )
 
 func ListCmd(args []string) {
@@ -26,7 +26,7 @@ func ListCmd(args []string) {
 		fmt.Printf("Error parsing flags")
 	}
 
-	expenses, err := models.ListExpenses(db.DB, *categoryID, *month, *year)
+	expenses, err := services.ListExpenses(db.DB, *categoryID, *month, *year)
 	if err != nil {
 		log.Fatalf("Error on list expense: %v", err)
 	}
