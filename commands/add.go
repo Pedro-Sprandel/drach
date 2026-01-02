@@ -25,7 +25,7 @@ func AddCmd(args []string) {
 	amount := fs.Float64("amount", 0, "Value of expense, integer")
 	fs.Float64Var(amount, "a", 0, "Alias for --amount")
 
-	categoryID := fs.String("category", "", "Category of expense (optional - will prompt if not provided)")
+	categoryID := fs.Int("category", 0, "Category of expense (optional - will prompt if not provided)")
 	fs.IntVar(categoryID, "c", 0, "Alias for --category")
 
 	currentMonth := helpers.CurrentMonth()
@@ -45,6 +45,8 @@ func AddCmd(args []string) {
 		fs.Usage()
 		os.Exit(1)
 	}
+
+	var err error
 
 	if *categoryID == 0 {
 		*categoryID, err = helpers.SelectCategory()

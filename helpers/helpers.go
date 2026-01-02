@@ -1,9 +1,10 @@
 package helpers
 
 import (
-	"drach/models"
 	"fmt"
 	"strings"
+
+	"drach/models"
 )
 
 func PrintExpenses(expenses []models.Expense) {
@@ -17,7 +18,7 @@ func PrintExpenses(expenses []models.Expense) {
 			"%-5d | %-24s | %-15s | %-5s | %-4d | R$%-4.2f\n",
 			expense.ID,
 			expense.Description,
-			expense.Category,
+			expense.CategoryID,
 			MonthName(expense.Month),
 			expense.Year,
 			expense.Amount,
@@ -32,8 +33,8 @@ func PrintExpenseSummary(summaries []models.ExpenseSummary, categoryTotals map[s
 	fmt.Println(strings.Repeat("-", 45))
 
 	for _, s := range summaries {
-		fmt.Printf("%-15s | %-10s | %-10d | R$ %9.2f\n",
-			s.Category,
+		fmt.Printf("%-15d | %-10s | %-10d | R$ %9.2f\n",
+			s.CategoryID,
 			MonthName(s.Month),
 			s.Year,
 			s.TotalAmount)

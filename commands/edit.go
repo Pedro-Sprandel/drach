@@ -18,8 +18,8 @@ func EditCmd(args []string) {
 	description := fs.String("description", "", "Description of expense, string")
 	fs.StringVar(description, "d", "", "Alias for --description")
 
-	categoryID := fs.String("category", "", "Category of expense for summary purposes, integer")
-	fs.StringVar(categoryID, "c", 0, "Alias for --category")
+	categoryID := fs.Int("category", 0, "Category of expense for summary purposes, integer")
+	fs.IntVar(categoryID, "c", 0, "Alias for --category")
 
 	amount := fs.Float64("amount", 0, "Value of expense, integer")
 	fs.Float64Var(amount, "a", 0, "Value of expense, integer")

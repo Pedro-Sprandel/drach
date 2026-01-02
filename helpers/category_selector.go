@@ -11,7 +11,7 @@ import (
 	"drach/models"
 )
 
-func SelectCategory() (int64, error) {
+func SelectCategory() (int, error) {
 	categories, err := models.GetAllCategories(db.DB)
 	if err != nil {
 		return 0, fmt.Errorf("erro ao buscar categorias: %v", err)
@@ -52,10 +52,10 @@ func SelectCategory() (int64, error) {
 	}
 
 	selectedCat := categories[choice-1]
-	return selectedCat["id"].(int64), nil
+	return selectedCat["id"].(int), nil
 }
 
-func createNewCategory() (int64, error) {
+func createNewCategory() (int, error) {
 	reader := bufio.NewReader(os.Stdin)
 
 	fmt.Println("\n=== Nova Categoria ===")
@@ -77,7 +77,7 @@ func createNewCategory() (int64, error) {
 	}
 	description = strings.TrimSpace(description)
 
-	result, err := models.AddCategory(name, description)
+	result, err := models.AddCategory(db.DB, name, description)
 	if err != nil {
 		return 0, fmt.Errorf("erro ao criar categoria: %v", err)
 	}
@@ -88,10 +88,10 @@ func createNewCategory() (int64, error) {
 	}
 
 	fmt.Printf("\n✅ Categoria '%s' criada com sucesso!\n", name)
-	return id, nil
+	return int(id), nil
 }
 
-func GetCategoryName(categoryID int64) (string, error) {
+func GetCategoryName(categoryID int) (string, error) {
 	var name string
 	err := db.DB.QueryRow("SELECT name FROM categories WHERE id = ?", categoryID).Scan(&name)
 	return name, err

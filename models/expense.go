@@ -17,7 +17,7 @@ type Expense struct {
 	CreatedAt   time.Time
 }
 
-func AddExpense(db *sql.DB, description string, amount float64, categoryID int64, month int, year int) error {
+func AddExpense(db *sql.DB, description string, amount float64, categoryID int, month int, year int) error {
 	_, err := db.Exec(
 		"INSERT INTO expenses(description, amount, category_id, month, year) VALUES (?, ?, ?, ?, ?)",
 		description,
@@ -79,7 +79,7 @@ func ListExpenses(db *sql.DB, categoryID string, month int, year int) ([]Expense
 	return expenses, nil
 }
 
-func EditExpense(db *sql.DB, id string, description string, categoryID int64, amount float64) error {
+func EditExpense(db *sql.DB, id string, description string, categoryID int, amount float64) error {
 	var query strings.Builder
 	query.WriteString("UPDATE expenses SET ")
 
@@ -98,8 +98,8 @@ func EditExpense(db *sql.DB, id string, description string, categoryID int64, am
 
 	// MUDAR DEPOIS
 	if categoryID > 0 {
-		updates = append(updates, "category = ?")
-		args = append(args, category)
+		updates = append(updates, "category_id = ?")
+		args = append(args, categoryID)
 	}
 
 	query.WriteString(strings.Join(updates, ", "))
@@ -117,7 +117,7 @@ func RemoveExpense(db *sql.DB, id string) error {
 }
 
 type ExpenseSummary struct {
-	Category    string
+	CategoryID  int
 	Month       int
 	Year        int
 	TotalAmount float64
@@ -126,7 +126,7 @@ type ExpenseSummary struct {
 func GetExpenseSummary(db *sql.DB, year int, month ...int) ([]ExpenseSummary, map[string]float64, map[int]float64, float64, error) {
 	query := `
         SELECT 
-            category, 
+            category_id, 
             month, 
             year, 
             SUM(amount) as total_amount
@@ -145,9 +145,9 @@ func GetExpenseSummary(db *sql.DB, year int, month ...int) ([]ExpenseSummary, ma
 
 	query += `
         GROUP BY 
-            category, month, year
+            category_id, month, year
         ORDER BY 
-            year, month, category
+            year, month, category_id
     `
 
 	rows, err := db.Query(query, args...)
@@ -167,13 +167,12 @@ func GetExpenseSummary(db *sql.DB, year int, month ...int) ([]ExpenseSummary, ma
 
 	for rows.Next() {
 		var s ExpenseSummary
-		err := rows.Scan(&s.Category, &s.Month, &s.Year, &s.TotalAmount)
+		err := rows.Scan(&s.CategoryID, &s.Month, &s.Year, &s.TotalAmount)
 		if err != nil {
 			return nil, nil, nil, 0, err
 		}
 
 		summaries = append(summaries, s)
-		categoryTotals[s.Category] += s.TotalAmount
 		monthlyTotals[s.Month] += s.TotalAmount
 		grandTotal += s.TotalAmount
 	}
