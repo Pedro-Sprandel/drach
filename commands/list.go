@@ -1,19 +1,20 @@
 package commands
 
 import (
-	"drach/db"
-	"drach/helpers"
-	"drach/models"
 	"flag"
 	"fmt"
 	"log"
+
+	"drach/db"
+	"drach/helpers"
+	"drach/models"
 )
 
 func ListCmd(args []string) {
 	fs := flag.NewFlagSet("list", flag.ExitOnError)
 
-	category := fs.String("category", "", "Filter by category")
-	fs.StringVar(category, "c", "", "Filter by category")
+	categoryID := fs.Int("category", 0, "Filter by category")
+	fs.IntVar(categoryID, "c", 0, "Filter by category")
 
 	month := fs.Int("month", 0, "Month of expense, integer")
 	fs.IntVar(month, "m", 0, "Month of expense, integer")
@@ -25,7 +26,7 @@ func ListCmd(args []string) {
 		fmt.Printf("Error parsing flags")
 	}
 
-	expenses, err := models.ListExpenses(db.DB, *category, *month, *year)
+	expenses, err := models.ListExpenses(db.DB, *categoryID, *month, *year)
 	if err != nil {
 		log.Fatalf("Error on list expense: %v", err)
 	}

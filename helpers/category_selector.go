@@ -52,7 +52,12 @@ func SelectCategory() (int, error) {
 	}
 
 	selectedCat := categories[choice-1]
-	return selectedCat["id"].(int), nil
+	id, ok := selectedCat["id"].(int64)
+	if !ok {
+		return 0, fmt.Errorf("erro ao converter Id da categoria")
+	}
+
+	return int(id), nil
 }
 
 func createNewCategory() (int, error) {

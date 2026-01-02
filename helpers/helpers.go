@@ -7,7 +7,7 @@ import (
 	"drach/models"
 )
 
-func PrintExpenses(expenses []models.Expense) {
+func PrintExpenses(expenses []models.ExpenseWithCategoryName) {
 	var sum float64 = 0
 
 	fmt.Printf("%-5s | %-24s | %-15s | %-2s | %-4s | %-7s\n", "ID", "Description", "Category", "Month", "Year", "Amount")
@@ -18,7 +18,7 @@ func PrintExpenses(expenses []models.Expense) {
 			"%-5d | %-24s | %-15s | %-5s | %-4d | R$%-4.2f\n",
 			expense.ID,
 			expense.Description,
-			expense.CategoryID,
+			expense.CategoryName,
 			MonthName(expense.Month),
 			expense.Year,
 			expense.Amount,

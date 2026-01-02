@@ -11,10 +11,21 @@ type Expense struct {
 	ID          int
 	Description string
 	Amount      float64
-	CategoryID  string
+	CategoryID  int
 	Month       int
 	Year        int
 	CreatedAt   time.Time
+}
+
+type ExpenseWithCategoryName struct {
+	ID           int
+	Description  string
+	Amount       float64
+	CategoryID   int
+	CategoryName string
+	Month        int
+	Year         int
+	CreatedAt    time.Time
 }
 
 func AddExpense(db *sql.DB, description string, amount float64, categoryID int, month int, year int) error {
@@ -30,10 +41,14 @@ func AddExpense(db *sql.DB, description string, amount float64, categoryID int, 
 	return err
 }
 
-func ListExpenses(db *sql.DB, categoryID string, month int, year int) ([]Expense, error) {
+func ListExpenses(db *sql.DB, categoryID int, month int, year int) ([]ExpenseWithCategoryName, error) {
 	query := `
-        SELECT id, description, amount, category_id, month, year, created_at 
-        FROM expenses
+  		SELECT 
+  			e.id, e.description, e.amount, e.category_id, 
+  			c.name, e.month, e.year, e.created_at 
+  		FROM expenses e	
+  		LEFT JOIN categories c ON e.category_id = c.id
+  		ORDER BY e.created_at DESC
     `
 
 	var args []any
@@ -64,11 +79,11 @@ func ListExpenses(db *sql.DB, categoryID string, month int, year int) ([]Expense
 		}
 	}()
 
-	var expenses []Expense
+	var expenses []ExpenseWithCategoryName
 	for rows.Next() {
-		var e Expense
+		var e ExpenseWithCategoryName
 
-		err := rows.Scan(&e.ID, &e.Description, &e.Amount, &e.CategoryID, &e.Month, &e.Year, &e.CreatedAt)
+		err := rows.Scan(&e.ID, &e.Description, &e.Amount, &e.CategoryID, &e.CategoryName, &e.Month, &e.Year, &e.CreatedAt)
 		if err != nil {
 			return nil, err
 		}
