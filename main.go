@@ -37,6 +37,8 @@ func main() {
 		commands.RemoveCmd(os.Args[2:])
 	case "summary":
 		commands.SummaryCmd(os.Args[2:])
+	case "env":
+		commands.EnvCmd(os.Args[2:])
 	case "help":
 		printHelp()
 	default:
@@ -54,5 +56,7 @@ func printHelp() {
 	fmt.Println("Add new task: add -d <description> -c <category> -a <amount>* -m <month> -y <year>")
 	fmt.Println("List tasks: list -c <category> -m <month> -y <year>")
 	fmt.Println("Edit task: edit -id <id>* -d <description> -c <category> -a <amount>* -m <month> -y <year>")
+	fmt.Println("Edit task: edit -id <id>* -d <description> -c <category> -a <amount>* -m <month> -y <year>")
 	fmt.Println("Remove task: remove -id <id>*")
+	fmt.Println("Environment: env switch <env> | status")
 }

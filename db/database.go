@@ -48,8 +48,23 @@ var tables = []TableDefinition{
 
 var DB *sql.DB
 
+func GetCurrentEnv() string {
+	config, err := os.ReadFile(".drach_config")
+	if err != nil {
+		return "prod"
+	}
+	return string(config)
+}
+
 func InitDB() error {
-	dbPath := "drach.db"
+	env := GetCurrentEnv()
+	var dbPath string
+	if env == "test" {
+		dbPath = "drach_test.db"
+	} else {
+		dbPath = "drach.db"
+	}
+
 	var err error
 
 	if _, err := os.Stat(dbPath); os.IsNotExist(err) {
