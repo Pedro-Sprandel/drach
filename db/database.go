@@ -4,6 +4,8 @@ import (
 	"database/sql"
 	"fmt"
 	"os"
+	"path/filepath"
+	"strings"
 
 	_ "github.com/mattn/go-sqlite3"
 )
@@ -56,14 +58,27 @@ func GetCurrentEnv() string {
 	return string(config)
 }
 
+func expandPath(path string) string {
+	if strings.HasPrefix(path, "~/") {
+		home, err := os.UserHomeDir()
+		if err != nil {
+			return path
+		}
+		return filepath.Join(home, path[2:])
+	}
+	return path
+}
+
 func InitDB() error {
 	env := GetCurrentEnv()
-	var dbPath string
+	dbPath := expandPath("~/Documentos/projects/drach")
+
 	if env == "test" {
-		dbPath = "drach_test.db"
+		dbPath += "/drach_test.db"
 	} else {
-		dbPath = "drach.db"
+		dbPath += "/drach.db"
 	}
+	fmt.Println(dbPath)
 
 	var err error
 
