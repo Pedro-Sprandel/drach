@@ -11,10 +11,7 @@ import (
 	"drach/services"
 )
 
-const (
-	defaultValueDescription = "Sem descrição"
-	defaultValueCategory    = "Sem categoria"
-)
+const defaultValueDescription = "Sem descrição"
 
 func AddCmd(args []string) {
 	fs := flag.NewFlagSet("add", flag.ExitOnError)
@@ -40,8 +37,10 @@ func AddCmd(args []string) {
 		fmt.Printf("Error parsing flags")
 	}
 
-	if *year < 2000 || *year > currentYear+1 {
-		fmt.Println("Invalid year")
+	if *amount == 0 {
+		fmt.Println()
+		fmt.Println("Amount is required")
+		fmt.Println()
 		fs.Usage()
 		os.Exit(1)
 	}
@@ -51,7 +50,7 @@ func AddCmd(args []string) {
 	if *categoryID == 0 {
 		*categoryID, err = helpers.SelectCategory()
 		if err != nil {
-			log.Fatalf("Erro ao selecionar categoria: %v", err)
+			log.Fatalf("Error on category selection: %v", err)
 		}
 	}
 
