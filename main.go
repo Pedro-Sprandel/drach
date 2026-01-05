@@ -37,6 +37,8 @@ func main() {
 		commands.RemoveCmd(os.Args[2:])
 	case "summary":
 		commands.SummaryCmd(os.Args[2:])
+	case "category":
+		commands.CategoryCmd(os.Args[2:])
 	case "env":
 		commands.EnvCmd(os.Args[2:])
 	case "help":

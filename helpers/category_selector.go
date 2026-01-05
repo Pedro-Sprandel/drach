@@ -21,10 +21,7 @@ func SelectCategory() (int, error) {
 	fmt.Println()
 
 	for i, cat := range categories {
-		fmt.Printf("  [%d] %s", i+1, cat["name"])
-		if desc, ok := cat["description"].(string); ok && desc != "" {
-			fmt.Printf(" - %s", desc)
-		}
+		fmt.Printf("  [%d] %s", i+1, cat.Name)
 		fmt.Println()
 	}
 
@@ -52,12 +49,8 @@ func SelectCategory() (int, error) {
 	}
 
 	selectedCat := categories[choice-1]
-	id, ok := selectedCat["id"].(int64)
-	if !ok {
-		return 0, fmt.Errorf("erro ao converter Id da categoria")
-	}
 
-	return int(id), nil
+	return int(selectedCat.ID), nil
 }
 
 func createNewCategory() (int, error) {
@@ -75,14 +68,7 @@ func createNewCategory() (int, error) {
 		return 0, fmt.Errorf("nome da categoria não pode ser vazio")
 	}
 
-	fmt.Print("Descrição (opcional, pressione Enter para pular): ")
-	description, err := reader.ReadString('\n')
-	if err != nil {
-		return 0, err
-	}
-	description = strings.TrimSpace(description)
-
-	result, err := services.AddCategory(db.DB, name, description)
+	result, err := services.AddCategory(db.DB, name)
 	if err != nil {
 		return 0, fmt.Errorf("erro ao criar categoria: %v", err)
 	}

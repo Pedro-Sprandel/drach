@@ -78,7 +78,6 @@ func InitDB() error {
 	} else {
 		dbPath += "/drach.db"
 	}
-	fmt.Println(dbPath)
 
 	var err error
 

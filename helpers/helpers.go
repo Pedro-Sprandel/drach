@@ -8,7 +8,7 @@ import (
 )
 
 const (
-	width  = 34
+	width  = 36
 	indent = "    "
 )
 
@@ -16,7 +16,7 @@ func Right(text string) string {
 	if len(text) >= width {
 		return indent + text
 	}
-	leftPad := width - len(text)
+	leftPad := width - len([]rune(text)) + 1
 	return indent + strings.Repeat(" ", leftPad) + text
 }
 
@@ -64,11 +64,11 @@ func PrintExpenseSummary(summaries []services.ExpenseSummary, categoryTotals map
 	fmt.Println("")
 	fmt.Println(Center("RESUMO DE GASTOS"))
 	fmt.Println(Line("="))
-	fmt.Print(indent + fmt.Sprintf("%-10s | %-8s | %-12s\n", "Categoria", "Mês/Ano", "Total"))
+	fmt.Print(indent + fmt.Sprintf("%-12s | %-8s | %-12s\n", "Categoria", "Mês/Ano", "Total"))
 	fmt.Println(Line("-"))
 
 	for _, s := range summaries {
-		fmt.Print(indent + fmt.Sprintf("%-10s | %-8s | R$ %7.2f\n",
+		fmt.Print(indent + fmt.Sprintf("%-12s | %-8s | R$ %7.2f\n",
 			s.CategoryName,
 			fmt.Sprintf("%s/%d", MonthName(s.Month), s.Year),
 			s.TotalAmount))
@@ -79,7 +79,7 @@ func PrintExpenseSummary(summaries []services.ExpenseSummary, categoryTotals map
 	fmt.Println(Center("TOTAIS POR CATEGORIA"))
 	fmt.Println(Line("="))
 	for category, total := range categoryTotals {
-		line := fmt.Sprintf("%-10s R$ %7.2f\n", category+":", total)
+		line := fmt.Sprintf("%-20s R$ %7.2f\n", category+":", total)
 		fmt.Print(Right(line))
 	}
 
