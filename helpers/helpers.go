@@ -59,7 +59,7 @@ func PrintExpenses(expenses []services.ExpenseWithCategoryName) {
 	fmt.Printf("\n%sTotal: R$%-4.2f", indent, sum)
 }
 
-func PrintExpenseSummary(summaries []services.ExpenseSummary, categoryTotals map[string]float64, monthlyTotals map[int]float64, grandTotal float64) {
+func PrintExpenseSummary(summaries []services.ExpenseSummary, categoryTotals []services.CategoryTotal, monthlyTotals map[int]float64, grandTotal float64) {
 	fmt.Println("")
 	fmt.Println("")
 	fmt.Println(Center("RESUMO DE GASTOS"))
@@ -78,8 +78,12 @@ func PrintExpenseSummary(summaries []services.ExpenseSummary, categoryTotals map
 	fmt.Println("")
 	fmt.Println(Center("TOTAIS POR CATEGORIA"))
 	fmt.Println(Line("="))
-	for category, total := range categoryTotals {
-		line := fmt.Sprintf("%-20s R$ %7.2f\n", category+":", total)
+	for _, item := range categoryTotals {
+		line := fmt.Sprintf(
+			"%-20s R$ %7.2f\n",
+			item.Category+":",
+			item.Total,
+		)
 		fmt.Print(Right(line))
 	}
 

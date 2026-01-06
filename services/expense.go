@@ -3,6 +3,7 @@ package services
 import (
 	"database/sql"
 	"log"
+	"sort"
 	"strings"
 	"time"
 )
@@ -140,6 +141,28 @@ func RemoveExpense(db *sql.DB, id string) error {
 	return err
 }
 
+type CategoryTotal struct {
+	Category string
+	Total    float64
+}
+
+func sortCategoryTotals(categoryTotals map[string]float64) []CategoryTotal {
+	sorted := make([]CategoryTotal, 0, len(categoryTotals))
+
+	for category, total := range categoryTotals {
+		sorted = append(sorted, CategoryTotal{
+			Category: category,
+			Total:    total,
+		})
+	}
+
+	sort.Slice(sorted, func(i, j int) bool {
+		return sorted[i].Total > sorted[j].Total
+	})
+
+	return sorted
+}
+
 type ExpenseSummary struct {
 	CategoryName string
 	CategoryID   int
@@ -149,7 +172,7 @@ type ExpenseSummary struct {
 	TotalAmount  float64
 }
 
-func GetExpenseSummary(db *sql.DB, categoryID int, year int, month int) ([]ExpenseSummary, map[string]float64, map[int]float64, float64, error) {
+func GetExpenseSummary(db *sql.DB, categoryID int, year int, month int) ([]ExpenseSummary, []CategoryTotal, map[int]float64, float64, error) {
 	query := `
         SELECT 
   					c.name,
@@ -180,8 +203,7 @@ func GetExpenseSummary(db *sql.DB, categoryID int, year int, month int) ([]Expen
 	query += `
         GROUP BY 
             category_id, month, year
-        ORDER BY 
-            year, month, category_id
+        ORDER BY 6 DESC
     `
 
 	rows, err := db.Query(query, args...)
@@ -213,10 +235,12 @@ func GetExpenseSummary(db *sql.DB, categoryID int, year int, month int) ([]Expen
 		grandTotal += s.TotalAmount
 	}
 
+	sortedCategoryTotals := sortCategoryTotals(categoryTotals)
+
 	if month != 0 {
 		monthTotal := monthlyTotals[month]
-		return summaries, categoryTotals, nil, monthTotal, nil
+		return summaries, sortedCategoryTotals, nil, monthTotal, nil
 	}
 
-	return summaries, categoryTotals, monthlyTotals, grandTotal, nil
+	return summaries, sortedCategoryTotals, monthlyTotals, grandTotal, nil
 }
