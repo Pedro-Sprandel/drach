@@ -88,7 +88,7 @@ func ListExpenses(db *sql.DB, categoryID int, month int, year int) ([]ExpenseWit
 	return expenses, nil
 }
 
-func EditExpense(db *sql.DB, id string, description string, categoryID int, amount float64) error {
+func EditExpense(db *sql.DB, id string, description string, categoryID int, amount float64, year int, month int) error {
 	var query strings.Builder
 	query.WriteString("UPDATE expenses SET ")
 
@@ -105,10 +105,19 @@ func EditExpense(db *sql.DB, id string, description string, categoryID int, amou
 		args = append(args, amount)
 	}
 
-	// MUDAR DEPOIS
 	if categoryID > 0 {
 		updates = append(updates, "category_id = ?")
 		args = append(args, categoryID)
+	}
+
+	if year != 0 {
+		updates = append(updates, "year = ?")
+		args = append(args, year)
+	}
+
+	if month != 0 {
+		updates = append(updates, "month = ?")
+		args = append(args, month)
 	}
 
 	query.WriteString(strings.Join(updates, ", "))

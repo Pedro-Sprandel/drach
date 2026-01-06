@@ -39,7 +39,7 @@ func AddCmd(args []string) {
 
 	if *amount == 0 {
 		fmt.Println()
-		fmt.Println("Amount is required")
+		fmt.Println("Error: Amount is required")
 		fmt.Println()
 		fs.Usage()
 		os.Exit(1)

@@ -24,23 +24,33 @@ func EditCmd(args []string) {
 	amount := fs.Float64("amount", 0, "Value of expense, integer")
 	fs.Float64Var(amount, "a", 0, "Value of expense, integer")
 
+	month := fs.Int("month", 0, "Month of expense, integer")
+	fs.IntVar(month, "m", 0, "Month of expense, integer")
+
+	year := fs.Int("year", 0, "Year of expense, integer")
+	fs.IntVar(year, "y", 0, "Year of expense, integer")
+
 	if err := fs.Parse(args); err != nil {
 		fmt.Print("Error parsing flags")
 	}
 
 	if *id == "" {
+		fmt.Println()
 		fmt.Println("Error: ID is required")
+		fmt.Println()
 		fs.Usage()
 		os.Exit(1)
 	}
 
-	if *description == "" && *amount == 0 && *categoryID == 0 {
-		fmt.Println("Error: at least one of --description, --amount or --category must be provided")
+	if *description == "" && *amount == 0 && *categoryID == 0 && *year == 0 && *month == 0 {
+		fmt.Println()
+		fmt.Println("Error: At least one property must be altered")
+		fmt.Println()
 		fs.Usage()
 		os.Exit(1)
 	}
 
-	err := services.EditExpense(db.DB, *id, *description, *categoryID, *amount)
+	err := services.EditExpense(db.DB, *id, *description, *categoryID, *amount, *year, *month)
 	if err != nil {
 		log.Fatalf("Error on edit expense %v:", err)
 	}
