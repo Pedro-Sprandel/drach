@@ -17,6 +17,12 @@ func AddCategory(db *sql.DB, name string) (sql.Result, error) {
 	return result, err
 }
 
+func EditCategory(db *sql.DB, id string, name string) (sql.Result, error) {
+	result, err := db.Exec("UPDATE categories SET name = ? WHERE id = ?", name, id)
+
+	return result, err
+}
+
 func ListCategories(db *sql.DB) {
 	categories, err := GetAllCategories(db)
 	if err != nil {

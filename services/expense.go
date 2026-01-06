@@ -42,25 +42,31 @@ func ListExpenses(db *sql.DB, categoryID int, month int, year int) ([]ExpenseWit
   			c.name, e.month, e.year, e.created_at 
   		FROM expenses e	
   		LEFT JOIN categories c ON e.category_id = c.id
-  		ORDER BY e.created_at DESC
     `
 
 	var args []any
 	filters := []string{}
 
 	if month > 0 {
-		filters = append(filters, "month = ?")
+		filters = append(filters, "e.month = ?")
 		args = append(args, month)
 	}
 
 	if year > 0 {
-		filters = append(filters, "year = ?")
+		filters = append(filters, "e.year = ?")
 		args = append(args, year)
+	}
+
+	if categoryID > 0 {
+		filters = append(filters, "e.category_id = ?")
+		args = append(args, categoryID)
 	}
 
 	if len(filters) > 0 {
 		query += " WHERE " + strings.Join(filters, " AND ")
 	}
+
+	query += " ORDER BY e.created_at DESC"
 
 	rows, err := db.Query(query, args...)
 	if err != nil {

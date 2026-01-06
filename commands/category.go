@@ -36,6 +36,37 @@ func CategoryCmd(args []string) {
 		}
 
 		fmt.Println("Category added successfully")
+	case "edit":
+		fs := flag.NewFlagSet("edit", flag.ExitOnError)
+
+		id := fs.String("id", "", "Id of the category")
+
+		name := fs.String("name", "", "Name of the category to add")
+		fs.StringVar(name, "n", "", "Name of the category to add")
+
+		if err := fs.Parse(args[1:]); err != nil {
+			fmt.Printf("Error parsing flags")
+		}
+
+		if *id == "" {
+			fmt.Print("Error: Id must be passed")
+			fs.Usage()
+			os.Exit(1)
+		}
+
+		if *name == "" {
+			fmt.Print("Error: Name must be passed")
+			fs.Usage()
+			os.Exit(1)
+		}
+
+		_, err := services.EditCategory(db.DB, *id, *name)
+		if err != nil {
+			fmt.Print("Error on edit category", err)
+			os.Exit(1)
+		}
+
+		fmt.Println("Category edited successfully")
 	case "remove":
 		fs := flag.NewFlagSet("remove", flag.ExitOnError)
 		ID := fs.String("id", "", "ID of item to remove")
